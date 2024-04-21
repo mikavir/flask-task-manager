@@ -26,6 +26,13 @@ def get_tasks():
     return render_template("tasks.html", tasks=tasks)
 
 
+@app.route("/search", methods=["GET", "POST"])
+def search():
+    query = request.form.get("query")
+    tasks = list(mongo.db.tasks.find({"$text": {"$search": query}}))
+    return render_template("tasks.html", tasks=tasks)
+    
+
 @app.route("/register", methods=["GET","POST"])
 def register():
     if request.method == "POST":
@@ -48,6 +55,7 @@ def register():
         flash("Registration Successful!")
         return redirect(url_for("profile", username=session["user"]))
     return render_template("register.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -78,6 +86,7 @@ def login():
     return render_template("login.html")
 
 
+
 @app.route("/profile/<username>", methods=["GET", "POST"])
 def profile(username):
     # grab the session user's username from db
@@ -96,6 +105,7 @@ def logout():
     flash("You have been logged out")
     session.pop("user")
     return redirect(url_for("login"))
+
 
 @app.route("/add_task", methods=["GET", "POST"])
 def add_task():
